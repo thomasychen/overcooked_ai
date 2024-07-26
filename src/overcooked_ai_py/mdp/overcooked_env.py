@@ -673,7 +673,10 @@ from overcooked_ai_py.agents.agent import AgentPair
 
 
 class OvercookedEnvPettingZoo(ParallelEnv):
-    def __init__(self, base_env, agents):
+    metadata = {
+        "name": "overcooked_v0",
+    }
+    def __init__(self, base_env, agents, render_mode = None):
         """
         base_env: OvercookedEnv
         agents: AgentPair
@@ -691,6 +694,7 @@ class OvercookedEnvPettingZoo(ParallelEnv):
             agents, AgentPair
         ), "agents must be an AgentPair object"
 
+        self.render_mode = render_mode
         self.agents = ["agent_0", "agent_1"]
         self.possible_agents = ["agent_0", "agent_1"]
         self.agent_map = {"agent_0": agents.a0, "agent_1": agents.a1}
@@ -747,8 +751,8 @@ class OvercookedEnvPettingZoo(ParallelEnv):
             Observation is potentially different for each agent
             """
             return {
-                agent: self.agent_map[agent].featurize(obs)
-                for agent in self.agents
+                agent: self.agent_map[agent].featurize(obs)[i]
+                for i, agent in enumerate(self.agents)
             }
 
         obs = create_obs_dict(obs)
@@ -774,7 +778,7 @@ class OvercookedEnvPettingZoo(ParallelEnv):
             agent: self.agent_map[agent].featurize(dummy_state)[0]
             for agent in self.agents
         }
-        return obs_dict, None
+        return obs_dict, {}
 
     def render(self, mode="human", close=False):
         pass
